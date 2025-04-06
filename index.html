@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi Screen YouTube Player</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f0f0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .controls input {
+            width: 200px;
+            padding: 10px;
+            margin: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #ff0000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            background: #000;
+            border-radius: 8px;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <input type="text" id="videoUrl" placeholder="YouTube URL डालें">
+            <input type="number" id="screenCount" min="1" max="10" value="4" placeholder="स्क्रीन संख्या">
+            <button onclick="loadVideo()">शुरू करें</button>
+        </div>
+        <div class="video-grid" id="videoContainer"></div>
+    </div>
+
+    <script>
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        function createVideoFrame(videoId) {
+            const iframe = document.createElement('iframe');
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`;
+            iframe.allow = 'accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture';
+            iframe.allowFullscreen = true;
+            return iframe;
+        }
+
+        function loadVideo() {
+            const videoUrl = document.getElementById('videoUrl').value;
+            const screenCount = parseInt(document.getElementById('screenCount').value);
+            const videoId = extractVideoId(videoUrl);
+
+            if (!videoId || isNaN(screenCount) || screenCount < 1) {
+                alert('कृपया सही डिटेल्स भरें');
+                return;
+            }
+
+            const videoContainer = document.getElementById('videoContainer');
+            videoContainer.innerHTML = '';
+
+            for (let i = 0; i < screenCount; i++) {
+                const videoWrapper = document.createElement('div');
+                videoWrapper.className = 'video-container';
+                videoWrapper.appendChild(createVideoFrame(videoId));
+                videoContainer.appendChild(videoWrapper);
+            }
+        }
+    </script>
+</body>
+</html>
